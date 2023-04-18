@@ -1,0 +1,222 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+namespace _18_04_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int program = 0;
+            while (program < 1)
+            {
+                string line = " ";
+                int lines = 0;
+                int totalentry = 0;
+                List<string> readed = new List<string>();
+                using (StreamReader sr = new StreamReader("/Users/macbook/Downloads/18AprProg2/Addressbook.txt"))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        readed.Add(line);
+                        if (line == "THIS IS AN ENTRY")
+                        {
+                            totalentry++;
+                        }
+                        lines = lines + 1;
+                    }
+                }
+                Console.WriteLine("There are this many entries in this address book: " + totalentry);
+                int dispstate = 0;
+                int addstate = 0;
+                int oneatime = 0;
+                Console.WriteLine("YOU WANNA ADD OR DISPLAY?");
+                string inpst = Console.ReadLine();
+                if (inpst == "ADD" || inpst == "add")
+                {
+                    addstate = 1;
+                }
+                if (inpst == "DISPLAY" || inpst == "display")
+                {
+                    dispstate = 1;
+                    Console.WriteLine("You wanna display ONE at a time or all at once? If you choose to display one at a time you can delete entries");
+                    string inpagain = Console.ReadLine();
+                    if(inpagain == "one" || inpagain == "ONE")
+                    {
+                        oneatime = 1;
+                    }
+                }
+                if (dispstate == 1)
+                {
+                    int entryno = 0;
+                    for (int disp = 0; disp < readed.Count; disp++)
+                    {
+                        if (readed[disp] == "THIS IS AN ENTRY")
+                        {
+                            entryno = entryno + 1;
+                            Console.WriteLine(" ");
+                            Console.WriteLine("This is entry number " + entryno);
+                        }
+                        if (readed[disp] == "NAME")
+                        {
+                            Console.WriteLine(readed[disp] + ": " + readed[disp + 1]);
+                        }
+                        if (readed[disp] == "ADDRESS")
+                        {
+                            Console.WriteLine(readed[disp] + ": " + readed[disp + 1]);
+                        }
+                        if (readed[disp] == "CONTACT")
+                        {
+                            Console.WriteLine(readed[disp] + ": " + readed[disp + 1]);
+                        }
+                        if (readed[disp] == "CUSTOMFIELD")
+                        {
+                            Console.WriteLine(readed[disp + 1] + ": " + readed[disp + 2]);
+                        }
+                        if(oneatime == 1 && readed[disp] == "ENDOFENTRY")
+                        {
+                            Console.WriteLine("Wanna go left (l) or right? You can also DELETE this entry if you want");
+                            string inplr = Console.ReadLine();
+                            if(inplr == "delete" || inplr == "DELETE")
+                            {
+                                int delete = 1;
+                                int deleting = 0;
+                                int deldisp = disp;
+                                while ( delete == 1)
+                                {
+                                    deleting = deleting + 1;
+                                    deldisp = deldisp - 1;
+                                    if (readed[deldisp] == "THIS IS AN ENTRY")
+                                    {
+                                        delete = 0;
+                                        Console.Clear();
+                                        Console.WriteLine("this entry has been deleted");
+                                        deldisp = deldisp - 1;
+                                        deleting = deleting + 1;
+                                    }
+                                }
+                                using (StreamWriter sw = new StreamWriter("/Users/macbook/Downloads/18AprProg2/Addressbook.txt"))
+                                {
+                                    int deltry = 1;
+                                    int delcount = 0;
+                                    while(deltry == 1)
+                                    {
+                                        sw.WriteLine(readed[delcount]);
+                                        if (delcount == deldisp)
+                                        {
+                                            for (int d = 0; d < deleting; d++)
+                                            {
+                                                sw.WriteLine("DELETED");
+                                                delcount = delcount + 1;
+                                            }
+                                        }
+                                        delcount = delcount + 1;
+                                        if (delcount == readed.Count)
+                                        {
+                                            deltry = 0;
+                                        }
+                                    }
+                                }
+                                Console.ReadKey();
+                            }
+                            if (entryno == 1 && inplr == "l")
+                            {
+                                int lefterror = 1;
+                                int errorhold = 0;
+                                disp = 0;
+                                while (lefterror == 1)
+                                {
+                                    disp = disp + 1;
+                                    if (readed[disp] == "THIS IS AN ENTRY")
+                                    {
+                                        errorhold = errorhold + 1;
+                                    }
+                                    if (readed[disp] == "THIS IS AN ENTRY" && errorhold == totalentry)
+                                    {
+                                        lefterror = 0;
+                                        disp = disp - 1;
+                                        entryno = totalentry - 1;
+                                    }
+                                }
+                            }
+                            else if (inplr == "l")
+                            {
+                                disp = 0;
+                                int lefting = 1;
+                                int lefthold = 0;
+                                while(lefting == 1)
+                                {
+                                    disp = disp + 1;
+                                    if (readed[disp] == "THIS IS AN ENTRY")
+                                    {
+                                        lefthold = lefthold + 1;
+                                    }
+                                    if (readed[disp] == "THIS IS AN ENTRY" && lefthold == entryno - 1)
+                                    {
+                                        lefting = 0;
+                                        disp = disp - 1;
+                                        entryno = entryno - 2;
+                                    }
+                                }
+                            }
+                            Console.Clear();
+                        }
+                    }
+                }
+                string inp = " ";
+                while (addstate == 1)
+                {
+                    using (StreamWriter sw = new StreamWriter("/Users/macbook/Downloads/18AprProg2/Addressbook.txt", true))
+                    {
+                        Console.WriteLine("You are now adding to the address book. Input the NAME");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("  ");
+                        sw.WriteLine("THIS IS AN ENTRY");
+                        sw.WriteLine("NAME");
+                        sw.WriteLine(inp);
+                        Console.WriteLine("Input the ADDRESS");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("ADDRESS");
+                        sw.WriteLine(inp);
+                        Console.WriteLine("Input the CONTACT NUMBER");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("CONTACT");
+                        sw.WriteLine(inp);
+                        int customf = 1;
+                        while(customf == 1)
+                        {
+                            Console.WriteLine("Do you want to add a custom field? Yes or No?");
+                            inp = Console.ReadLine();
+                            if(inp == "Yes" || inp == "yes")
+                            {
+                                Console.WriteLine("Input the name of the custom field");
+                                inp = Console.ReadLine();
+                                sw.WriteLine("CUSTOMFIELD");
+                                sw.WriteLine(inp);
+                                Console.WriteLine("Input the details of the custom field for this entry");
+                                inp = Console.ReadLine();
+                                sw.WriteLine(inp);
+                            }
+                            else
+                            {
+                                customf = 0;
+                            }
+                        }
+                        sw.WriteLine("ENDOFENTRY");
+                        break;
+                    }
+                }
+                Console.ReadKey();
+                Console.Clear();
+            }
+            Console.ReadKey();
+        }
+    }
+}
