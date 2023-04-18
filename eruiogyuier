@@ -1,0 +1,129 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using System.IO;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+namespace _18_04_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int program = 0;
+            while(program < 1)
+            {
+                string line = " ";
+                int correct = 0;
+                int lines = 0;
+                int totalentry = 0;
+                List<string> readed = new List<string>();
+                using (StreamReader sr = new StreamReader("C:\\Auh\\Address.txt"))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        //Console.WriteLine(line);
+                        readed.Add(line);
+                        if (lines == 0 && line == "THIS IS AN ADDRESS BOOK")
+                        {
+                            correct = 1;
+                        }
+                        if (line == "THIS IS AN ENTRY")
+                        {
+                            totalentry++;
+                        }
+                        lines = lines + 1;
+                    }
+                }
+                Console.WriteLine("There are this many entries in this address book: " + totalentry);
+                if (correct == 1)
+                {
+                    Console.WriteLine("This is an address book");
+                }
+                int dispstate = 0;
+                int addstate = 0;
+                Console.WriteLine("YOU WANNA ADD OR DISPLAY?");
+                string inpst = Console.ReadLine();
+                if(inpst == "ADD")
+                {
+                    addstate = 1;
+                }
+                if (inpst == "DISPLAY")
+                {
+                    dispstate = 1;
+                }
+                if (dispstate == 1)
+                {
+                    int entryno = 0;
+                    for (int disp = 0; disp < readed.Count; disp++)
+                    {
+                        //Console.WriteLine(readed[disp]);
+
+                        if (readed[disp] == "THIS IS AN ENTRY")
+                        {
+                            entryno = entryno + 1;
+                            Console.WriteLine("This is entry number " + entryno);
+                        }
+
+                        if (readed[disp] == "NAME")
+                        {
+                            Console.WriteLine(readed[disp] + " " + readed[disp + 1]);
+                        }
+                        if (readed[disp] == "ADDRESS")
+                        {
+                            Console.WriteLine(readed[disp] + " " + readed[disp + 1]);
+                        }
+                        if (readed[disp] == "CONTACT")
+                        {
+                            Console.WriteLine(readed[disp] + " " + readed[disp + 1]);
+                        }
+
+                        //for (int disp2 = 0; disp2 < readed.Count; disp2++)
+                        //{
+                        //    if(readed[disp2] == "CUSTOMFIELD")
+                        //    {
+                        //        Console.WriteLine(readed[disp2 + 1] + " " + readed[disp2 + 2]);
+                        //    }
+                        //}
+
+                        //if (readed[disp] == "CUSTOMFIELD")
+                        //{
+                        //    Console.WriteLine(readed[disp + 1] + " " + readed[disp + 2]);
+                        //}
+                    }
+                }
+                string inp = " ";
+                while (addstate == 1)
+                {
+                    using (StreamWriter sw = new StreamWriter("C:\\Auh\\Address.txt", true))
+                    {
+                        Console.WriteLine("You are now adding to the address book. Input the NAME");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("  ");
+                        sw.WriteLine("THIS IS AN ENTRY");
+                        sw.WriteLine("NAME");
+                        sw.WriteLine(inp);
+
+                        Console.WriteLine("Input the ADDRESS");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("ADDRESS");
+                        sw.WriteLine(inp);
+
+                        Console.WriteLine("Input the CONTACT NUMBER");
+                        inp = Console.ReadLine();
+                        sw.WriteLine("CONTACT");
+                        sw.WriteLine(inp);
+                        break;
+                    }
+                }
+                Console.ReadKey();
+            }
+            Console.ReadKey();
+        }
+    }
+}
