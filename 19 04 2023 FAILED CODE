@@ -1,0 +1,84 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace _19_04_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string line = " ";
+            List<string> readed = new List<string>();
+            string lineget = " ";
+            string[] addline;
+            using (StreamReader sr = new StreamReader("C:\\Auh\\Readthis.txt"))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    lineget = line;
+                    addline = lineget.Split(' ');
+                    for (int a = 0; a < addline.Length; a++ )
+                    {
+                        readed.Add(addline[a]);
+                    }
+                }
+            }
+            int total = readed.Count;
+            List<string> words = new List<string>();
+            List<int> count = new List<int>();
+            for(int c = 0; c < readed.Count; c++)
+            {
+                words.Add(readed[c]);
+                for(int c1 = c + 1; c1 < readed.Count; c1++)
+                {
+                    if (readed[c1] == words[c])
+                    {
+                        words[c] = " ";
+                    }
+                }
+            }
+            for (int b = 0; b < words.Count; b++)
+            {
+                count.Add(0);
+            }
+            for (int n = 0; n< words.Count; n++)
+            {
+                int wordcount = 0;
+                if (words[n] != " ") 
+                {
+                    for (int c = 0; c < readed.Count; c++)
+                    {
+                        if (readed[c] == words[n])
+                        {
+                            wordcount++;
+                        }
+                    }
+                }
+                count[n] = wordcount;
+            }
+            //TWO STRINGS [words.Count] add to it and remove from the original if it finds a larger, only does it after it finds the larger.
+            for(int c = 0; c < words.Count; c++)
+            {
+
+            }
+
+            Console.WriteLine(words.Count);
+            Console.WriteLine(readed.Count);
+            Console.WriteLine("The total wordcount for this document is " + total);
+            for (int b = 0; b < count.Count; b++)
+            {
+                if (count[b] != 0)
+                {
+                    Console.WriteLine(" " + words[b] + " - " + count[b] + " ");
+                }
+            }
+            Console.ReadKey();
+        }
+    }
+}
