@@ -1,0 +1,165 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace _19_04_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string line = " ";
+            List<string> readed = new List<string>();
+            string lineget = " ";
+            string[] addline;
+            using (StreamReader sr = new StreamReader("/Users/macbook/Downloads/18AprProg2/ToRead.txt"))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    lineget = line;
+                    addline = lineget.Split(' ');
+                    for (int a = 0; a < addline.Length; a++)
+                    {
+                        readed.Add(addline[a]);
+                    }
+                }
+            }
+            int total = readed.Count;
+            //THE PURPOSE OF THIS BLOCK OF CODE IS TO GET A LIST OF EVERY NUMBER IN THE TEXT WITH NO REPEATS
+            int spaces = 0;
+            List<string> charactercheck = new List<string>() { ".", "?", ",", "!", "'s", "'", ";" };
+            List<string> words = new List<string>();
+            for (int x0 = 0; x0 < readed.Count; x0++)
+            {
+                int duped = 0;
+                string[] unik;
+                unik = readed[x0].Select(x => x.ToString()).ToArray();
+                for (int characterchecking = 0; characterchecking < charactercheck.Count; characterchecking++)
+                {
+                    if (unik.Length == 0)
+                    {
+                        spaces = spaces + 1;
+                    }
+                    else if (unik[unik.Length - 1] == charactercheck[characterchecking])
+                    {
+                        List<string> unik2 = new List<string>(unik);
+                        unik2.RemoveAt(unik.Length - 1);
+                        unik = unik2.ToArray();
+                    }
+                    else if (unik[0] == charactercheck[characterchecking]) //to accomodate a "'" at the front of the word
+                    {
+                        List<string> santa = new List<string>(unik);
+                        santa.RemoveAt(0);
+                        unik = santa.ToArray();
+                    }
+                    if (unik.Length < 3)
+                    {
+                    }
+                    else if ((unik[unik.Length - 2] + unik[unik.Length - 1]) == charactercheck[characterchecking]) //to accomodate "'s"
+                    {
+                        List<string> santa = new List<string>(unik);
+                        santa.RemoveAt(unik.Length - 1);
+                        santa.RemoveAt(unik.Length - 2);
+                        unik = santa.ToArray();
+                    }
+                }
+                string dupex = (string.Join("", unik));
+                dupex = dupex.ToLower(); //changes to lowercase?
+                for (int x1 = 0; x1 < words.Count; x1++)
+                {
+                    if (dupex == words[x1])
+                    {
+                        duped = duped + 1;
+                    }
+                }
+                if (duped == 0)
+                {
+                    words.Add(dupex);
+                }
+            }
+            //THE POINT OF THIS BLOCK OF CODE IS TO COUNT HOW MANY OF EACH WORD ARE PRESENT IN THE TEXT
+            List<int> count = new List<int>();
+            for (int c = 0; c < words.Count; c++)
+            {
+                int dupe = 0;
+                for (int c1 = 0; c1 < readed.Count; c1++)
+                {
+                    string[] rudolph;
+                    rudolph = readed[c1].Select(x => x.ToString()).ToArray();
+                    for (int characterchecking = 0; characterchecking < charactercheck.Count; characterchecking++)
+                    {
+                        if (rudolph.Length == 0)
+                        {
+                        }
+                        else if (rudolph[rudolph.Length - 1] == charactercheck[characterchecking])
+                        {
+                            List<string> santa = new List<string>(rudolph);
+                            santa.RemoveAt(rudolph.Length - 1);
+                            rudolph = santa.ToArray();
+                        }
+                        else if (rudolph[0] == charactercheck[characterchecking]) //to accomodate a "'" at the front of the word
+                        {
+                            List<string> santa = new List<string>(rudolph);
+                            santa.RemoveAt(0);
+                            rudolph = santa.ToArray();
+                        }
+                        if (rudolph.Length < 3)
+                        {
+                        }
+                        else if ((rudolph[rudolph.Length - 2] + rudolph[rudolph.Length - 1]) == charactercheck[characterchecking]) //to accomodate "'s"
+                        {
+                            List<string> santa = new List<string>(rudolph);
+                            santa.RemoveAt(rudolph.Length - 1);
+                            santa.RemoveAt(rudolph.Length - 2);
+                            rudolph = santa.ToArray();
+                        }
+                    }
+                    string reindeer = (string.Join("", rudolph));
+                    reindeer = reindeer.ToLower(); //??
+                    if (words[c] == reindeer)
+                    {
+                        dupe = dupe + 1;
+                    }
+                }
+                count.Add(dupe);
+            }
+            //THIS BLOCK OF CODE IS MEANT TO REARRANGE THE LISTS IN DESCENDING ORDER
+            List<string> arwords = new List<string>();
+            List<int> arcount = new List<int>();
+            for (int a1 = 0; a1 < words.Count; a1++)
+            {
+                int topcount = -1;
+                string topword = " ";
+                int topin = 0;
+                for (int a = 0; a < words.Count; a++)
+                {
+                    if (count[a] > topcount)
+                    {
+                        topcount = count[a];
+                        topword = words[a];
+                        topin = a;
+                    }
+                }
+                arcount.Add(topcount);
+                arwords.Add(topword);
+                count[topin] = 0;
+            }
+            using (StreamWriter sw = new StreamWriter("/Users/macbook/Downloads/18AprProg2/Theoutput.txt"))
+            {
+                sw.WriteLine("This is the word count of this text: " + (total - (spaces / charactercheck.Count)));
+                for (int du = 0; du < arwords.Count; du++)
+                    sw.WriteLine(arwords[du] + " - " + arcount[du]);
+
+            }
+            Console.WriteLine("This is the word count of this text: " + (total - (spaces / charactercheck.Count)));
+            for (int du = 0; du < arwords.Count; du++)
+                Console.WriteLine(arwords[du] + " - " + arcount[du]);
+            Console.ReadKey();
+        }
+    }
+}
