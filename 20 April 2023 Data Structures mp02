@@ -1,0 +1,173 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace _20_02_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //THIS BLOCK OF CODE WILL READ Setup.ini
+            string line = " ";
+            List<string> readed = new List<string>();
+            string lineget = " ";
+            string[] addline;
+            using (StreamReader sr = new StreamReader("/Users/macbook/Downloads/Prog2 file reading/20 Apr/Setup.txt"))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    lineget = line;
+                    addline = lineget.Split('=');
+                    for (int a = 0; a < addline.Length; a++)
+                    {
+                        readed.Add(addline[a]);
+                    }
+                }
+            }
+            //THIS BLOCK OF CODE WILL ADD Setup.ini TO THE LOGIC OF THE CODE
+            int CharPerLine = 0;
+            int Indent = 0;
+            string InFile = "";
+            string OutFile = "";
+            for (int du = 0; du < readed.Count; du++)
+            {
+                if (readed[du] == "CharPerLine")
+                    CharPerLine = Convert.ToInt32(readed[du + 1]);
+                if (readed[du] == "Indent")
+                    Indent = Convert.ToInt32(readed[du + 1]);
+                if (readed[du] == "InFile")
+                    InFile = readed[du + 1];
+                if (readed[du] == "OuTFile")
+                    OutFile = readed[du + 1];
+            }
+            //THIS CODE READS THE SECOND FILE
+            line = " ";
+            readed = new List<string>();
+            lineget = " ";
+            if (Indent == 1)
+            {
+                for (int i10 = 10; i10 > 0; i10--)
+                    readed.Add(" ");
+            }
+            using (StreamReader sr = new StreamReader("/Users/macbook/Downloads/Prog2 file reading/20 Apr/" + InFile))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] charget;
+                    charget = line.Select(x => x.ToString()).ToArray();
+                    if (charget.Length == 0)
+                    {
+                        readed.Add("INDENT");
+                        if(Indent == 1)
+                        {
+                            for (int i10 = 10; i10 > 0; i10--)
+                                readed.Add(" ");
+                        }
+                    }
+                    else if (charget.Length > 0)
+                    {
+                        for (int a = 0; a < charget.Length; a++)
+                            readed.Add(charget[a]);
+                    }
+                }
+            }
+            //THIS BLOCK OF CODE MAKES IT SO THE WORDS DONT CUT
+            int charcount = 0;
+            for (int ax = 0; ax < readed.Count; ax++)
+            {
+                charcount = charcount + 1;
+                if (readed[ax] == "INDENT")
+                    charcount = 0;
+                if(charcount == CharPerLine)
+                {
+
+                    if (readed[ax + 1] == " ")
+                    {
+                        readed[ax + 1] = "LINECUT";
+                        charcount = 0;
+                    }
+                    else
+                    {
+                        ax = ax - 2;
+                        charcount = charcount - 1;
+                    }
+                }
+            }
+            int lastlinecut = 1; //THIS CODE CUTS OUT THE LAST LINE OF EVERY PARAGRAPH CAUSE THE SAMPLE OUTPUTS DO IT
+            if (lastlinecut == 1) 
+            {
+                readed.Add("INDENT");
+                readed.Add(" ");
+                for (int ax = 0; ax < readed.Count; ax++)
+                {
+                    if (readed[ax] == "INDENT")
+                    {
+                        readed[ax - 1] = "CHOP";
+                        int hold = ax;
+                        int cutting = 1;
+                        while (cutting == 1)
+                        {
+                            if (readed[hold] == "LINECUT")
+                            {
+                                readed[hold] = "CHOP";
+                                cutting = 0;
+                            }
+                            hold = hold - 1;
+                        }
+                    }
+                }
+                for (int ax = 0; ax < readed.Count; ax++)
+                {
+                    if (readed[ax] == "CHOP")
+                    {
+                        int cutting = 1;
+                        int chop = 0;
+                        while(cutting == 1)
+                        {
+                            readed[ax + chop] = "CHOPPED";
+                            if (readed[ax + chop + 1] == "CHOP")
+                            {
+                                readed[ax + chop + 1] = "CHOPPED";
+                                cutting = 0;
+                            }
+                            chop = chop + 1;
+                        }
+                    }
+                }
+            }
+            //THIS BLOCK OF CODE WILL OUTPUT THE THING
+            using (StreamWriter sw = new StreamWriter("/Users/macbook/Downloads/Prog2 file reading/20 Apr/" + OutFile))
+            {
+                for (int x = 0; x < readed.Count; x++)
+                {
+                    while (readed[x] == "CHOPPED")
+                        x = x + 1;
+                    if (readed[x] == "LINECUT")
+                    {
+                        sw.WriteLine("");
+                        x = x + 1;
+                    }
+                    if (readed[x] == "INDENT")
+                    {
+                        sw.WriteLine("\n");
+                        x = x + 1;
+                    }
+                    sw.Write(readed[x]);
+                }
+            }
+            int dbug = 0;
+            if (dbug == 1)
+            {
+                Console.WriteLine(CharPerLine + "-" + Indent + "-" + InFile + "-" + OutFile);
+                for (int debug = 0; debug < readed.Count; debug++)
+                    Console.Write(readed[debug] + "-");
+                Console.ReadKey();
+            }
+        }
+    }
+}
