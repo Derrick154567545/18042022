@@ -70,7 +70,8 @@ namespace _20_02_2023
                 readed.Add(fread[h]);
             }
             fread.Clear();
-            //SHUFFLE
+
+            //SHUFFLE could insert into the program
             List<int> exclude = new List<int>();
             string lastartist = "";
             string[] hold = new string[] { };
@@ -93,9 +94,6 @@ namespace _20_02_2023
                     done = 1;
                     randy = rnd.Next(0, readed.Count);
                     hold = readed[randy].Split(',');
-
-                    //addanyway script was here originally. its put at the bottom so it only adds if the current one is actually sameartist
-
                     if (errorcount > 20000)
                     {
                         done = 0;
@@ -114,13 +112,15 @@ namespace _20_02_2023
                                 if (randy == exclude[x])
                                     addanyway = 0;
                             }
+                            sameartist = 0; //where d
                             if (addanyway == 1)
                             {
                                 fread.Add(readed[randy]);
                                 exclude.Add(randy);
                                 lastartist = hold[1];
                                 errorcount = 0;
-                                sameartist = 0;
+
+                                
                                 continue;
                             }
                         }
@@ -168,6 +168,8 @@ namespace _20_02_2023
                     sw.WriteLine(" ");
                 }
             }
+
+
             int program = 1;
             string[] shold = new string[] { };
             List<string> titty = new List<string>();
