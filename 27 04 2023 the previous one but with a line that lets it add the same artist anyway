@@ -1,0 +1,268 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace _20_02_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //THIS BLOCK OF CODE WILL READ Setup.ini
+            string line = " ";
+            List<string> readed = new List<string>();
+            string lineget = " ";
+            string[] addline;
+            string InFile = "C:\\Auh\\top10000songs.csv";
+            string OutFile = "C:\\Auh\\SHUFFLE.csv";
+            string OutFile2 = "C:\\Auh\\SEARCH.csv";
+            line = " ";
+            lineget = " ";
+            string thisthing = "\"";
+            using (StreamReader sr = new StreamReader(InFile))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    int oh = 0;
+                    string[] charget;
+                    charget = line.Select(x => x.ToString()).ToArray();
+                    for (int a = 0; a < charget.Length; a++)
+                    {
+                        if (charget[a] == "ENDLINE")
+                            oh = 0;
+                        if (charget[a] == thisthing)
+                        {
+                            if (oh == 1)
+                                oh = 0;
+                            else if (oh == 0)
+                                oh = 1;
+                        }
+                        if (charget[a] == "," && oh == 1)
+                        {
+                            charget[a] = "|";
+                        }
+                        readed.Add(charget[a]);
+                    }
+                    readed.Add("ENDLINE");
+                }
+            }
+            List<string> fread = new List<string>();
+            string fadd = " ";
+            int skip = 0;
+            for (int h = 0; h < readed.Count; h++)
+            {
+                if (readed[h] == "ENDLINE")
+                {
+                    fread.Add(fadd);
+                    fadd = "";
+                }
+                else
+                    fadd = fadd + readed[h];
+            }
+            //THIS BLOCK OF CODE TRANSFERS THE CONTENTS OF FREAD TO READED
+            readed.Clear();
+            for (int h = 0; h < fread.Count; h++)
+            {
+                readed.Add(fread[h]);
+            }
+            fread.Clear();
+            //SHUFFLE
+            List<int> exclude = new List<int>();
+            string lastartist = "";
+            string[] hold = new string[] { };
+            Random rnd = new Random();
+            int randy = 0;
+            string firsthold = " ";
+            int done = 0;
+            int debug = 0;
+            string splitthis = ",";
+            while (done == 0)
+            {
+                int errorcount = 0;
+                int sameartist = 0;
+                fread.Clear();
+                exclude.Clear();
+                while (fread.Count != readed.Count)
+                {
+                    int cont = 0;
+                    
+                    done = 1;
+                    randy = rnd.Next(0, readed.Count);
+                    hold = readed[randy].Split(',');
+
+                    //addanyway script was here originally. its put at the bottom so it only adds if the current one is actually sameartist
+
+                    if (errorcount > 20000)
+                    {
+                        done = 0;
+                        break;
+                    }
+                    if (hold[1] == lastartist)
+                    {
+                        cont = 1;
+                        sameartist = sameartist + 1;
+
+                        if (sameartist > 100)
+                        {
+                            int addanyway = 1;
+                            for (int x = 0; x < exclude.Count; x++)
+                            {
+                                if (randy == exclude[x])
+                                    addanyway = 0;
+                            }
+                            if (addanyway == 1)
+                            {
+                                fread.Add(readed[randy]);
+                                exclude.Add(randy);
+                                lastartist = hold[1];
+                                errorcount = 0;
+                                sameartist = 0;
+                                continue;
+                            }
+                        }
+
+                    }
+                    for (int x = 0; x < exclude.Count; x++)
+                    {
+                        if (randy == exclude[x])
+                            cont = 1;
+                    }
+                    if (cont == 1)
+                    {
+                        errorcount = errorcount + 1;
+                        debug = debug + 1;
+                        if (debug == 1000)
+                        {
+                            debug = 0;
+                        }
+                        continue;
+                    }
+                    fread.Add(readed[randy]);
+                    exclude.Add(randy);
+                    lastartist = hold[1];
+                    errorcount = 0;
+                }
+            }
+            string thatword = "|";
+            //THIS BLOCK OF CODE WILL OUTPUT THE THING
+            using (StreamWriter sw = new StreamWriter(OutFile))
+            {
+                for (int r = 0; r < fread.Count; r++)
+                {
+                    string[] charget;
+                    charget = fread[r].Select(x => x.ToString()).ToArray();
+
+                    for (int a = 0; a < charget.Length; a++)
+                    {
+                        if (charget[a] == "|")
+                        {
+                            sw.Write(",");
+                            continue;
+                        }
+                        sw.Write(charget[a]);
+                    }
+                    sw.WriteLine(" ");
+                }
+            }
+            int program = 1;
+            string[] shold = new string[] { };
+            List<string> titty = new List<string>();
+            List<string> artism = new List<string>();
+            while (program == 1)
+            {
+                Console.WriteLine("Wanna search by song TITLE or ARTIST? (Input either ARTIST OR TITLE)");
+                string inp = Console.ReadLine();
+                if (inp == "TITLE")
+                {
+                    titty.Clear();
+                    Console.WriteLine("gib TITLE");
+                    inp = Console.ReadLine();
+                    for (int h = 0; h < fread.Count; h++)
+                    {
+                        int sim = 0;
+                        string sholdin = "";
+                        string[] charget;
+                        charget = fread[h].Select(x => x.ToString()).ToArray();
+                        for (int a = 0; a < charget.Length; a++)
+                        {
+                            if (charget[a] == "|")
+                            {
+                                charget[a] = (",");
+                            }
+                            sholdin = sholdin + charget[a];
+                        }
+                        shold = sholdin.Split(',');
+                        if (shold[2] == inp)
+                        {
+                            titty.Add(fread[h]);
+                        }
+                    }
+                    for (int t = 0; t < titty.Count; t++)
+                    {
+                        string[] charget;
+                        charget = titty[t].Select(x => x.ToString()).ToArray();
+                        for (int a = 0; a < charget.Length; a++)
+                        {
+                            if (charget[a] == "|")
+                            {
+                                Console.Write(",");
+                                continue;
+                            }
+                            Console.Write(charget[a]);
+                        }
+                        Console.WriteLine(" ");
+                    }
+                }
+                if(inp == "ARTIST")
+                {
+                    artism.Clear();
+                    Console.WriteLine("gib Artist");
+                    inp = Console.ReadLine();
+                    using (StreamWriter sw = new StreamWriter(OutFile2))
+                    {
+                        for (int h = 0; h < fread.Count; h++)
+                        {
+                            int sim = 0;
+                            string sholdin = "";
+                            string[] charget;
+                            charget = fread[h].Select(x => x.ToString()).ToArray();
+                            for (int a = 0; a < charget.Length; a++)
+                            {
+                                if (charget[a] == "|")
+                                {
+                                    charget[a] = (",");
+                                }
+                                sholdin = sholdin + charget[a];
+                            }
+                            shold = sholdin.Split(',');
+                            if (shold[1] == inp)
+                            {
+                                artism.Add(fread[h]);
+                            }
+                        }
+                        for (int t = 0; t < artism.Count; t++)
+                        {
+                            string[] charget;
+                            charget = artism[t].Select(x => x.ToString()).ToArray();
+                            for (int a = 0; a < charget.Length; a++)
+                            {
+                                if (charget[a] == "|")
+                                {
+                                    sw.Write(",");
+                                    continue;
+                                }
+                                sw.Write(charget[a]);
+                            }
+                            sw.WriteLine(" ");
+                        }
+                    }
+                }
+            }
+            Console.ReadKey();
+        }
+    }
+}
