@@ -1,0 +1,238 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+namespace _18_04_2023
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int program = 1;
+            while (program == 1)
+            {
+                Console.Clear();
+                string line = " ";
+                string folder = "";
+                int entryno = 0;
+                string disable = "";
+                List<string> masterhold = new List<string>();
+                using (StreamReader sr = new StreamReader("/Users/macbook/Downloads/Prog2 file reading/2 May Midterm/Filepath.ini"))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        folder = line;
+                        Console.WriteLine("Reading the filepath ini");
+                    }
+                }
+                Console.WriteLine(folder); //DEBUGGING
+                if (!File.Exists(folder + "/MayMaster.ini"))
+                {
+                    using (StreamWriter sw = new StreamWriter(folder + "/MayMaster.ini"))
+                    {
+                    }
+                    Console.WriteLine("Making the masterlist because it wasnt there"); //DEBUGGING
+                }
+                else
+                    Console.WriteLine("Masterlist is already here"); //DEBUGGING
+                using (StreamReader sr = new StreamReader(folder + "/MayMaster.ini"))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        masterhold.Add(line);
+                    }
+                }
+                for (int e = 0; e < masterhold.Count; e++)
+                    if (masterhold[e] == "INI ADALAH ENTRI")
+                        entryno = entryno + 1;
+                Console.WriteLine("Your addressbook contains " + entryno + " contacts");
+                if(entryno == 0)
+                    disable = "DISABLED";
+                Console.WriteLine("What do you want to do?");
+                Console.WriteLine("(A) Add Entry");
+                Console.WriteLine("(B) View Contacts" + " " + disable);
+                Console.WriteLine("(C) Delete Contacts" + " " + disable);
+                Console.WriteLine("(D) Quit");
+                string input = Console.ReadLine();
+                string input2 = "";
+                if(input == "A" || input == "a")
+                {
+                    Console.Clear();
+                    List<string> addlist = new List<string>();
+                    string filename = "";
+                    Console.WriteLine("Input the First Name");
+                    input2 = Console.ReadLine();
+                    filename = filename + input2[0] + "_";
+                    addlist.Add("NAMA PERTAMA"); //Index word
+                    addlist.Add(input2);
+                    Console.WriteLine("Input the Last Name");
+                    input2 = Console.ReadLine();
+                    filename = filename + input2;
+                    addlist.Add("NAMA TERAKHIR"); //Index word
+                    addlist.Add(input2);
+                    int addcustomfield = 1;
+                    while(addcustomfield == 1)
+                    {
+                        Console.WriteLine("Would you like to add a custom field? (y or n)");
+                        input2 = Console.ReadLine();
+                        if (input2 == "n")
+                            addcustomfield = 0;
+                        if(input2 == "y")
+                        {
+                            Console.WriteLine("What is the custom field?");
+                            input2 = Console.ReadLine();
+                            addlist.Add("MEDAN TERSUAI"); //Index word
+                            addlist.Add(input2);
+                            Console.WriteLine("Whats the " + input2 + " of " + filename + "?");
+                            input2 = Console.ReadLine();
+                            addlist.Add(input2);
+                        }
+                    }
+                    int namecheck = 0;
+                    int check = 0;
+                    string filenamefix = filename;
+                    while (check == 0)
+                    {
+                        check = 1;
+                        for(int n = 0; n < masterhold.Count; n++)
+                        {
+                            if (filenamefix == masterhold[n])
+                            {
+                                namecheck = namecheck + 1;
+                                check = 0;
+                                filenamefix = filename + "_" + namecheck;
+                            }
+                        }
+                    }
+                    filename = filenamefix;
+                    using (StreamWriter sw = new StreamWriter(folder + "/" + filename))
+                    {
+                        for (int a = 0; a < addlist.Count; a++)
+                            sw.WriteLine(addlist[a]);
+                    }
+                    using (StreamWriter sw = new StreamWriter(folder + "/MayMaster.ini", true))
+                    {
+                        sw.WriteLine("INI ADALAH ENTRI"); //INDEX WORD
+                        sw.WriteLine(filename);
+                    }
+                }
+                if (input == "D" || input == "d")
+                    program = 0;
+                if (input == "B" || input == "b")
+                {
+                    if (disable == "DISABLED")
+                        continue;
+                    int display = 1;
+                    while (display == 1)
+                    {
+                        Console.Clear();
+                        entryno = 0;
+                        for (int b = 0; b < masterhold.Count; b++)
+                        {
+                            List<string> displayhold = new List<string>();
+                            if (masterhold[b] == "INI ADALAH ENTRI")
+                            {
+                                entryno = entryno + 1;
+                                continue;
+                            }
+                            if (masterhold[b] == "DIHAPUSKAN")
+                                continue;
+                            using (StreamReader sr = new StreamReader(folder + "/" + masterhold[b]))
+                            {
+                                while ((line = sr.ReadLine()) != null)
+                                {
+                                    displayhold.Add(line);
+                                }
+                            }
+                            Console.WriteLine("This is entry number: " + entryno);
+                            for (int b2 = 0; b2 < displayhold.Count; b2++)
+                            {
+                                if (displayhold[b2] == "NAMA PERTAMA")
+                                    Console.WriteLine("First Name: " + displayhold[b2 + 1]);
+                                if (displayhold[b2] == "NAMA TERAKHIR")
+                                    Console.WriteLine("Last Name: " + displayhold[b2 + 1]);
+                                if (displayhold[b2] == "MEDAN TERSUAI")
+                                    Console.WriteLine(displayhold[b2 + 1] + ": " + displayhold[b2 + 2]);
+                            }
+                            Console.WriteLine("R to go right Q to quit");
+                            input2 = Console.ReadLine();
+                            if (input2 == "r" || input2 == "R")
+                                Console.Clear();
+                            if (input2 == "q" || input2 == "Q")
+                            {
+                                display = 0;
+                                break;
+                            }
+                            Console.Clear();
+                        }
+                    }
+                }
+                if (input == "C" || input == "c")
+                {
+                    Console.Clear();
+                    entryno = 0;
+                    for(int c = 0; c < masterhold.Count; c++)
+                    {
+                        if (masterhold[c] == "INI ADALAH ENTRI")
+                        {
+                            entryno = entryno + 1;
+                            Console.WriteLine("This is Entry no " + entryno + ": " + masterhold[c + 1]);
+                        }
+                    }
+                    Console.WriteLine("Type the number of the entry you want to delete or type Q to quit");
+                    input2 = Console.ReadLine();
+                    if (input2 == "Q" || input2 == "q")
+                        continue;
+                    int intinput = Convert.ToInt32(input2);
+                    entryno = 0;
+                    for (int c = 0; c < masterhold.Count; c++)
+                    {
+                        if (masterhold[c] == "INI ADALAH ENTRI")
+                        {
+                            entryno = entryno + 1;
+                        }
+                        if (entryno == intinput)
+                        {
+                            masterhold[c] = "DIHAPUSKAN";
+                            masterhold[c + 1] = "DIHAPUSKAN";
+                            break;
+                        }
+                    }
+                    using (StreamWriter sw = new StreamWriter(folder + "/MayMaster.ini")) 
+                    {
+                        for (int c2 = 0; c2 < masterhold.Count; c2++)
+                            sw.WriteLine(masterhold[c2]);
+                    }
+                }
+                //FINAL PART REARRANGE BY LAST NAME
+                List<string> rearranger = new List<string>();
+                using (StreamReader sr = new StreamReader(folder + "/MayMaster.ini"))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line == "DIHAPUSKAN" || line == "INI ADALAH ENTRI")
+                            continue;
+                        else
+                            rearranger.Add(line);
+                    }
+                }
+                rearranger.Sort((n1, n2) => n1.Split("_")[1].CompareTo(n2.Split("_")[1]));
+                //Console.WriteLine(string.Join(",", rearranger));
+                using (StreamWriter sw = new StreamWriter(folder + "/MayMaster.ini")) //Replace ini with txt or ml or smth
+                {
+                    for (int r = 0; r < rearranger.Count; r++)
+                    {
+                        sw.WriteLine("INI ADALAH ENTRI");
+                        sw.WriteLine(rearranger[r]);
+                    }
+                }
+            }
+        }
+    }
+}
